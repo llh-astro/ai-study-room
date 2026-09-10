@@ -1,5 +1,6 @@
 // The sheet reuses the existing per-question chat DOM and request lifecycle.
 function chatChrome(){
+ $('study-sheet-handle').hidden=!sheetOpen;
  const chatVisible=view==='chat'&&currentTab==='ai';
  $('study-chat-size').hidden=!chatVisible;$('study-chat-hide').hidden=!chatVisible;
  $('study-chat-size').textContent=sheetOpen?'展开':'返回题目';
@@ -10,17 +11,22 @@ function openChatSheet(){
  const scroll=window.scrollY;if(currentTab==='quiz')quizScroll=scroll;
  navigate('ai');if(view!=='chat')return;
  setChatSheet(true);
- const root=$('hot100-root').hidden?$('question'):$('h-question'),body=root.querySelector('.q-body');
- if(body){window.scrollTo(0,window.scrollY+body.getBoundingClientRect().top-12);quizScroll=window.scrollY;}else window.scrollTo(0,quizScroll);
+ revealSheetQuestion();
+}
+function revealSheetQuestion(){
+ const root=$('hot100-root').hidden?$('ai-bank-root'):$('hot100-root'),body=root.querySelector('.q-body');
+ if(body)root.scrollTop+=body.getBoundingClientRect().top-root.getBoundingClientRect().top-8;
 }
 function prepareChatOptions(){
+ $('study-send').closest('.study-row').classList.add('chat-submit');
+ document.querySelector('.study-chat-compose>.study-row').classList.add('chat-prompts');
  const details=document.createElement('details');details.id='study-chat-options';details.open=true;
  const summary=document.createElement('summary');summary.textContent='附带内容与更多设置';details.append(summary);
  for(const el of document.querySelectorAll('.study-chat-compose .study-check'))details.append(el);
  const row=document.createElement('div');row.className='study-row';row.append($('study-chat-assess'),$('study-chat-settings'));details.append(row);
  $('study-chat-compose-end')?.remove();$('study-status').before(details);chatChrome();
 }
-$('study-chat-size').onclick=()=>{if(sheetOpen){setChatSheet(false);markTab('ai');window.scrollTo(0,0);}else{const q=currentQuestion();if(!q||q.id!==activeChat){openChatSheet();return;}setChatSheet(true);window.scrollTo(0,quizScroll);}};
+$('study-chat-size').onclick=()=>{if(sheetOpen){setChatSheet(false);markTab('ai');window.scrollTo(0,0);}else{const q=currentQuestion();if(!q||q.id!==activeChat){openChatSheet();return;}setChatSheet(true);revealSheetQuestion();}};
 $('study-chat-hide').onclick=()=>navigate('quiz');
 function syncQuestionChat(){
  for(const [id,buttonId] of [['question','question-ask-ai'],['h-question','hot-ask-ai']]){
@@ -32,3 +38,16 @@ for(const id of ['question','h-question'])new MutationObserver(syncQuestionChat)
 for(const id of ['ai-bank-root','hot100-root'])new MutationObserver(syncQuestionChat).observe($(id),{attributes:true,attributeFilter:['hidden']});
 syncQuestionChat();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetOpen){e.preventDefault();navigate('quiz');}});
+// Resize only from the handle/header; content areas keep their normal scrolling.
+let sheetDrag=null;
+const sheetHandle=$('study-sheet-handle');
+function sheetLimit(){return Math.max(160,window.innerHeight-parseFloat(getComputedStyle(document.body).getPropertyValue('--bottom-nav'))-110);}
+function resizeSheet(height){const value=Math.round(Math.max(160,Math.min(sheetLimit(),height)));document.body.style.setProperty('--chat-panel-height',value+'px');sheetHandle.setAttribute('aria-valuenow',value);sheetHandle.setAttribute('aria-valuemax',Math.round(sheetLimit()));}
+for(const surface of [sheetHandle,document.querySelector('.study-dialog-head')]){
+ surface.addEventListener('pointerdown',e=>{if(!sheetOpen||e.target.closest('button')||e.button!==0)return;sheetDrag={id:e.pointerId,y:e.clientY,height:$('study-dialog').getBoundingClientRect().height,surface};surface.setPointerCapture(e.pointerId);e.preventDefault();});
+ surface.addEventListener('pointermove',e=>{if(!sheetDrag||sheetDrag.id!==e.pointerId)return;resizeSheet(sheetDrag.height+sheetDrag.y-e.clientY);e.preventDefault();});
+ surface.addEventListener('pointerup',e=>{if(!sheetDrag||sheetDrag.id!==e.pointerId)return;const target=sheetDrag.height+sheetDrag.y-e.clientY;sheetDrag=null;if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId);if(target<145){document.body.style.removeProperty('--chat-panel-height');navigate('quiz');}else resizeSheet(target);});
+ surface.addEventListener('pointercancel',()=>{if(sheetDrag)resizeSheet(sheetDrag.height);sheetDrag=null;});
+}
+sheetHandle.addEventListener('keydown',e=>{const height=$('study-dialog').getBoundingClientRect().height;if(e.key==='ArrowUp'){e.preventDefault();resizeSheet(height+40);}else if(e.key==='ArrowDown'){e.preventDefault();if(height<=180){document.body.style.removeProperty('--chat-panel-height');navigate('quiz');}else resizeSheet(height-40);}else if(e.key==='Home'){e.preventDefault();navigate('quiz');}});
+window.addEventListener('resize',()=>{document.body.style.removeProperty('--chat-panel-height');});

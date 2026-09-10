@@ -1,6 +1,6 @@
 {
   "name": "ai-study-room",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "description": "Offline quiz, DeepSeek tutoring and personal learning assessments",
   "scripts": {
