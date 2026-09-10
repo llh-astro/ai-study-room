@@ -1,0 +1,32 @@
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict'),path=require('node:path'),{pathToFileURL}=require('node:url');
+(async()=>{
+ const browser=await chromium.launch({channel:process.env.PLAYWRIGHT_CHANNEL||undefined,headless:true});const context=await browser.newContext(),page=await context.newPage();
+ await page.addInitScript(()=>{
+  const get=k=>sessionStorage.getItem('native:'+k),put=(k,v)=>{sessionStorage.setItem('native:'+k,v);return true};
+  window.AndroidStudy={get,put,drop:k=>{sessionStorage.removeItem('native:'+k);return true},batch:raw=>{const all=JSON.parse(raw);for(const [k,v]of Object.entries(all))put(k,v);return true},hasKey:()=>sessionStorage.getItem('native:key-set')==='yes',saveKey:k=>{sessionStorage.setItem('native:key-set',k?'yes':'no');return true},testKey:()=>window.StudyBridgeEvent({type:'test'}),ai:(id,payload)=>{window.__request={id,payload:JSON.parse(payload)};window.StudyBridgeEvent({id,type:'delta',content:'这是一段正在生成的回答。'});},cancel:id=>{window.__cancel=id},exportFile:(name,mime,text)=>{window.__export={name,mime,text}},importFile:()=>{window.__importCalled=true},update:url=>{window.__updateURL=url}};
+ });
+ await page.goto(pathToFileURL(path.join(__dirname,'index.html')).href);
+ await page.locator('[data-choice="B"]').click();await page.locator('#submit').click();
+ assert.match(await page.evaluate(()=>sessionStorage.getItem('native:ai-practice-150-v1')),/"correct":true/);
+ assert.equal(await page.evaluate(()=>Object.keys(localStorage).includes('ai-practice-150-v1')),false);
+ await page.reload();assert.equal(await page.locator('#doneStat').innerText(),'1');
+ await page.locator('#study-settings').click();await page.locator('#study-key').fill('test-native-key-placeholder');await page.locator('#study-key-save').click();
+ await page.locator('#study-key-test').click();assert.match(await page.locator('#study-api-status').innerText(),/连接成功/);
+ await page.locator('#study-close').click();await page.locator('#study-ask').click();await page.locator('#study-input').fill('请解释这道题');await page.locator('#study-send').click();assert.equal(await page.locator('#study-send').isDisabled(),true);
+ await page.locator('#study-stop').click();assert.equal(await page.locator('#study-send').isDisabled(),false);assert.match(await page.locator('.study-message.assistant').innerText(),/已停止/);
+ const cancelled=await page.evaluate(()=>window.__cancel);assert.ok(cancelled);
+ await page.evaluate(id=>window.StudyBridgeEvent({id,type:'delta',content:'不应该出现的晚到消息'}),cancelled);assert.equal(await page.getByText('不应该出现的晚到消息').count(),0);
+ await page.reload();await page.locator('#study-ask').click();assert.match(await page.locator('.study-message.assistant').innerText(),/正在生成的回答/);
+ await page.locator('#study-close').click();await page.locator('#study-settings').click();await page.locator('[data-settings-tab="backup"]').click();await page.locator('#study-backup').click();const exported=await page.evaluate(()=>window.__export);assert.ok(exported.text.includes('正在生成的回答'));assert.equal(exported.text.includes('test-native-key-placeholder'),false);
+ await page.locator('[data-settings-tab="bank"]').click();await page.locator('#study-update-url').fill('https://example.org/bank.json');await page.locator('#study-update-check').click();assert.equal(await page.evaluate(()=>window.__updateURL),'https://example.org/bank.json');
+ await page.evaluate(()=>window.StudyBridgeEvent({type:'update',error:'网络不可用'}));assert.match(await page.locator('#study-status').innerText(),/网络不可用/);
+ const chunked=await page.evaluate(()=>{const text='文件😀内容'.repeat(12000),raw=JSON.stringify({type:'export',error:text}),n=Math.ceil(raw.length/23000);for(let i=0;i<n;i++)window.StudyBridgeChunk('large-transfer',i,n,raw.slice(i*23000,(i+1)*23000));return document.getElementById('study-status').textContent===text});assert.equal(chunked,true);
+ await page.locator('#study-library').click();await page.locator('#study-assess').click();await page.locator('#assessment-generate').click();
+ assert.match(await page.locator('#assessment-report').innerText(),/正在生成/);const assessmentRequest=await page.evaluate(()=>window.__request);assert.match(assessmentRequest.payload.messages[1].content,/答题快照/);
+ await page.locator('#study-ask').click();assert.equal(await page.locator('#study-send').isDisabled(),true);await page.locator('#study-library').click();await page.locator('#assessment-stop').click();assert.match(await page.locator('#study-status').innerText(),/已停止/);
+ await page.evaluate(id=>window.StudyBridgeEvent({id,type:'delta',content:'LATE_ASSESSMENT'}),assessmentRequest.id);assert.equal(await page.getByText('LATE_ASSESSMENT').count(),0);
+ await page.clock.install();await page.locator('#assessment-generate').click();await page.clock.fastForward(121000);assert.match(await page.locator('#study-status').innerText(),/120 秒/);assert.equal(await page.locator('#assessment-generate').isDisabled(),false);
+ const reports=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('native:study-personal-v1')).notes.filter(n=>n.source?.assessment));assert.deepEqual(reports.map(n=>n.source.assessment.state),['cancelled','error']);
+ console.log('PASS: native progress/backup adapter, key secrecy, chat stream/cancel, assessment generation, shared request lock, page-switch restoration, stop, late-event isolation and assessment timeout. Bridge simulation, not an Android device test.');await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
