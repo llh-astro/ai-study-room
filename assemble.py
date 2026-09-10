@@ -33,7 +33,7 @@ def assemble():
     hot_js=(ROOT/'hot100.js').read_text(encoding='utf-8')
     hot_js=hot_js.replace("if(!active||", "if(document.getElementById('study-dialog').open||!active||")
     hot_js=hot_js.replace("mastered+'%'", "(mastered/qs.length*100)+'%'")
-    study_js=(ROOT/'study.js').read_text(encoding='utf-8').replace('// Testable pure contract;', (ROOT/'study-assessment.js').read_text(encoding='utf-8')+'\n// Testable pure contract;')
+    study_js=(ROOT/'study.js').read_text(encoding='utf-8').replace('// Testable pure contract;', (ROOT/'study-assessment.js').read_text(encoding='utf-8')+'\n'+(ROOT/'study-sheet.js').read_text(encoding='utf-8')+'\n// Testable pure contract;')
     extra = '\n<script>\n'+hot_js+'\n</script>\n<script>\n'+study_js+'\n</script>\n'
     page = page.replace('</body>',extra+'</body>',1)
     assert "KEY='ai-practice-150-v1'" in page

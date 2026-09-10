@@ -6,7 +6,7 @@ const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math
 const parse=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))||fallback}catch{return fallback}};
 let personal=parse(KEY,{schema:1,chats:{},notes:[]}),settings=parse(SETTINGS,{model:'deepseek-v4-flash',updateUrl:''}),memoryKey='',pending=null,activeChat=null,view='',fileMode='',staged=null,unreadable=false;
 let keyTest=null,lastKeyStatus='';
-let currentTab='quiz',quizScroll=0,toastTimer=null;
+let currentTab='quiz',quizScroll=0,toastTimer=null,sheetOpen=false;
 const paneCache=new Map();
 function paneKey(tab,id=activeChat){return tab==='ai'?'ai:'+id:tab;}
 function stashPane(){if(currentTab==='quiz'){quizScroll=window.scrollY;return;}const fragment=document.createDocumentFragment(),scroll=$('study-body').scrollTop;while($('study-body').firstChild)fragment.append($('study-body').firstChild);paneCache.set(paneKey(currentTab),{fragment,view,title:$('study-title').textContent,activeChat,scroll});}
@@ -15,11 +15,12 @@ function navigate(tab){
  const q=tab==='ai'?currentQuestion():null;
  if(tab==='ai'&&!q){toast('请先在刷题页选择一道题');return;}
  if(currentTab===tab&&(tab!=='ai'||activeChat===q.id))return;
- stashPane();markTab(tab);
+ stashPane();setChatSheet(false);markTab(tab);
  if(tab==='quiz'){$('study-dialog').close();window.scrollTo(0,quizScroll);return;}
  const cached=paneCache.get(paneKey(tab,q?.id));
  if(cached){$('study-body').replaceChildren(cached.fragment);view=cached.view;activeChat=cached.activeChat;$('study-title').textContent=cached.title;if(!$('study-dialog').open)$('study-dialog').show();$('study-body').scrollTop=cached.scroll;if(view==='chat'){refreshMessages();buttons()}if(view==='assessment')refreshAssessment();if(view==='library')$('study-search').oninput();if(view==='settings'){keyButtons();if(lastKeyStatus&&$('study-api-status'))$('study-api-status').textContent=lastKeyStatus;}}
  else if(tab==='ai')chat(q);else if(tab==='library')library();else renderSettings();
+ chatChrome();
 }
 if(personal.schema!==1||!personal.chats||!Array.isArray(personal.notes)){personal={schema:1,chats:{},notes:[]};unreadable=true}
 for(const c of Object.values(personal.chats))for(const m of c.messages||[])if(m.status==='streaming')m.status='interrupted';
@@ -44,7 +45,7 @@ async function testKey(){
  }catch(e){if(request&&keyTest!==request)return;const error=e.name==='TypeError'?'网络请求失败。请检查网络；网页版也可能受到跨域限制。':e.message;if(keyTest)finishKeyTest(keyTest.id,error);else keyStatus(error)}
 }
 function savePersonal(){if(unreadable)throw Error('知识库数据格式异常，请先导出原始备份');localStorage.setItem(KEY,JSON.stringify(personal));}
-function show(title,type){const tab=type==='chat'?'ai':type==='note'||type==='library'||type==='assessment'?'library':'settings';if(currentTab!==tab){stashPane();markTab(tab);}view=type;$('study-title').textContent=title;if(!$('study-dialog').open)$('study-dialog').show();$('study-body').scrollTop=0;}
+function show(title,type){const tab=type==='chat'?'ai':type==='note'||type==='library'||type==='assessment'?'library':'settings';if(currentTab!==tab){stashPane();markTab(tab);}view=type;setChatSheet(false);$('study-title').textContent=title;if(!$('study-dialog').open)$('study-dialog').show();$('study-body').scrollTop=0;}
 function catchAction(fn){return async(...args)=>{try{await fn(...args)}catch(e){toast(e.message||'操作未完成，请重试');if($('study-status'))$('study-status').textContent=e.message;}}}
 function bankData(){return {ai:JSON.parse($('question-data').textContent),hot:JSON.parse($('hot100-data').textContent)}}
 function currentQuestion(){
@@ -57,7 +58,7 @@ function formatText(text){return String(text).split(/```[^\n]*\n/).map((p,i)=>i%
 function chat(q){const c=getChat(q);show(c.title+' · AI 对话','chat');activeChat=c.id;$('study-body').innerHTML=`<p class="study-small">对话自动保存在本机。发送时将向 DeepSeek 提交本题上下文与近期对话；费用由你自己的 API 账户承担。</p><details><summary>提问时的题目快照</summary><p class="study-meta">${esc(c.stem)}</p></details><div id="study-messages"></div><div class="study-chat-compose"><div class="study-row"><button data-prompt="给我一点提示，不要直接给出答案。">只给提示</button><button data-prompt="请用简单例子解释这道题，说明容易出错的原因。">解释这道题</button><button data-prompt="请检查我的草稿，指出错误和边界情况，不要声称你已经运行过代码。">检查我的代码</button><button data-prompt="请像面试官一样，围绕本题继续追问我，一次只问一个问题。">面试追问</button></div><label for="study-input">你的问题</label><textarea id="study-input" placeholder="哪里不理解？可以接着上一次对话提问。"></textarea><label class="study-check"><input id="study-attach" type="checkbox">附带当前答案 / 代码草稿</label><label class="study-check"><input id="study-reference" type="checkbox">附带原题解（只要提示时可不勾选）</label><div class="study-row"><button id="study-send" class="study-primary">发送</button><button id="study-stop">停止生成</button><button id="study-chat-assess">学习评估</button><button id="study-chat-settings">设置 API Key</button></div><p id="study-status" class="study-result"></p></div>`;
  refreshMessages();$('study-chat-assess').onclick=()=>assessmentPage();$('study-chat-settings').onclick=()=>navigate('settings');
  document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{$('study-input').value=b.dataset.prompt;if(b.dataset.prompt.includes('草稿'))$('study-attach').checked=true});
- $('study-send').onclick=catchAction(()=>send(q));$('study-stop').onclick=stop;buttons();
+ $('study-send').onclick=catchAction(()=>send(q));$('study-stop').onclick=stop;prepareChatOptions();buttons();
 }
 function refreshMessages(){if(view!=='chat'||!$('study-messages'))return;const c=personal.chats[activeChat];$('study-messages').innerHTML=c.messages.map(messageHtml).join('');document.querySelectorAll('[data-note-message]').forEach(b=>b.onclick=()=>{const m=c.messages.find(m=>m.id===b.dataset.noteMessage);editNote({id:uid(),title:c.title,body:m.content,tags:[],status:'待理解',source:{chatId:c.id,messageId:m.id,title:c.title,snapshot:c.snapshot,origin:'AI'},created:now(),updated:now()})})}
 function buttons(){refreshAssessment();if($('study-send'))$('study-send').disabled=!!pending;if($('study-stop'))$('study-stop').disabled=!pending;}
@@ -144,7 +145,7 @@ function compactQuiz(){
 }
 compactQuiz();
 let gesture=null;
-document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||e.clientX<20||e.clientX>innerWidth-20||e.target.closest('input,textarea,select,pre,code,button,a,summary'))return;gesture={x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId};});
+document.addEventListener('pointerdown',e=>{if(sheetOpen||e.pointerType!=='touch'||e.clientX<20||e.clientX>innerWidth-20||e.target.closest('input,textarea,select,pre,code,button,a,summary'))return;gesture={x:e.clientX,y:e.clientY,t:performance.now(),id:e.pointerId};});
 document.addEventListener('pointercancel',()=>gesture=null);
 document.addEventListener('pointerup',e=>{const g=gesture;gesture=null;if(!g||g.id!==e.pointerId||performance.now()-g.t>700||String(getSelection()))return;const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.abs(dx)<90||Math.abs(dx)<Math.abs(dy)*1.8)return;const tabs=['quiz','ai','library','settings'],index=tabs.indexOf(currentTab)+(dx<0?1:-1);if(index>=0&&index<tabs.length)navigate(tabs[index]);});
 

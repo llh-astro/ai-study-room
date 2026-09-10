@@ -4,7 +4,7 @@
 
 - 在线刷题：<https://llh-astro.github.io/ai-study-room/>
 - APK 题库更新地址：<https://llh-astro.github.io/ai-study-room/bank.json>
-- Android 安装包：[v1.0.2](release/AI练习室-v1.0.2.apk)
+- Android 安装包：[v1.0.3](release/AI练习室-v1.0.3.apk)
 - [安装、备份与使用说明](release/安装与使用说明.md)
 - [基础知识学习方案（尚未实现）](COURSE_PLAN.md)
 
@@ -12,6 +12,7 @@
 
 - 两套题库，收藏、错题、算法草稿与掌握标记。
 - 底部四栏导航与左右滑动，手机端折叠筛选和题号导航。
+- 刷题页底部 AI 对话面板，可展开 / 收起，保留每题聊天与本次未发送输入。
 - 用户自填 DeepSeek API Key，流式题目对话、停止生成、连接测试。
 - 可搜索、编辑的知识笔记，JSON 完整备份及 Markdown 导出。
 - AI 学习评估：模块统计、知识缺口、建议学习顺序与补测；每份报告保存当时的答题快照。
