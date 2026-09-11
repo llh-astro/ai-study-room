@@ -22,7 +22,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
   localStorage.setItem('leetcode-hot100-python-v1',JSON.stringify({status:{'lc-1':'review'},drafts:{'lc-1':'private draft'},saved:['lc-1'],current:'lc-1'}));
  });await p.reload();
  const prior=await p.evaluate(()=>['ai-practice-150-v1','ai-basics-300-v1','leetcode-hot100-python-v1'].map(k=>localStorage.getItem(k)));
- await p.locator('#bank-enterprise').click();assert.equal(await p.locator('#e-grid button').count(),210);
+ await p.locator('#bank-toggle').click();await p.locator('#bank-enterprise').click();assert.equal(await p.locator('#e-grid button').count(),210);
  assert.equal(await p.locator('#enterprise-root').isVisible(),true);
  assert.equal(await p.locator('#basic-root').isVisible(),false);
  await p.locator(`[data-e-choice="${data.questions[0].answer}"]`).click();await p.locator('#e-submit').click();
@@ -38,9 +38,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  await p.locator('#e-search').fill('');await p.locator('#e-moduleFilter').selectOption('1');assert.equal(await p.locator('#e-grid button').count(),30);
  await p.locator('#e-moduleFilter').selectOption('');
  await p.evaluate(()=>{for(const b of [...document.querySelectorAll('#e-grid button')]){b.click();if(document.querySelectorAll('#e-question .option').length!==4)throw Error('Question render');}});
- await p.reload();await p.locator('#bank-enterprise').click();assert.equal(await p.locator('#e-doneStat').innerText(),'2');assert.equal(await p.locator('#e-savedStat').innerText(),'1');
+ await p.reload();await p.locator('#bank-toggle').click();await p.locator('#bank-enterprise').click();assert.equal(await p.locator('#e-doneStat').innerText(),'2');assert.equal(await p.locator('#e-savedStat').innerText(),'1');
  assert.deepEqual(await p.evaluate(()=>['ai-practice-150-v1','ai-basics-300-v1','leetcode-hot100-python-v1'].map(k=>localStorage.getItem(k))),prior);
- for(const id of ['bank-ai','bank-basic','bank-hot100','bank-enterprise']){await p.locator('#'+id).click();assert.equal(await p.locator('.layout:visible').count(),1);}
+ for(const id of ['bank-ai','bank-basic','bank-hot100','bank-enterprise']){await p.locator('#bank-toggle').click();await p.locator('#'+id).click();assert.equal(await p.locator('.layout:visible').count(),1);}
  await p.setViewportSize({width:360,height:780});assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await p.screenshot({path:path.join(__dirname,'preview-enterprise-mobile.png')});
  // Real UI + mocked transport: per-question context and learning-assessment inclusion.
@@ -59,10 +59,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
   const broken=structuredClone(pkg);broken.enterprise.questions.pop();let deletion=false;try{StudyContracts.validateBank(broken)}catch{deletion=true}
   pkg.enterprise.questions[0].refs='javascript:alert(1)';let unsafe=false;try{StudyContracts.validateBank(pkg)}catch{unsafe=true}return {count,deletion,unsafe};
  },backup);assert.deepEqual(validation,{count:210,deletion:true,unsafe:true});
- const fresh=await browser.newContext(),q=await fresh.newPage();await q.goto(url);await q.locator('#study-settings').click();await q.locator('[data-settings-tab=backup]').click();await q.locator('#study-restore').click();await q.locator('#study-file').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});await q.locator('#study-apply').click();await q.waitForLoadState('load');await q.locator('#bank-enterprise').click();assert.equal(await q.locator('#e-doneStat').innerText(),'2');
+ const fresh=await browser.newContext(),q=await fresh.newPage();await q.goto(url);await q.locator('#study-settings').click();await q.locator('[data-settings-tab=backup]').click();await q.locator('#study-restore').click();await q.locator('#study-file').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});await q.locator('#study-apply').click();await q.waitForLoadState('load');await q.locator('#bank-toggle').click();await q.locator('#bank-enterprise').click();assert.equal(await q.locator('#e-doneStat').innerText(),'2');
  // Revised answers preserve historic grading instead of silently changing progress.
  const pkg=await q.evaluate(()=>({format:'ai-study-bank',schema:1,version:'test-revision',ai:JSON.parse(document.getElementById('question-data').textContent),hot:JSON.parse(document.getElementById('hot100-data').textContent),basics:JSON.parse(document.getElementById('basics-data').textContent),enterprise:JSON.parse(document.getElementById('enterprise-data').textContent)}));pkg.enterprise.questions[0].answer=data.questions[0].answer==='A'?'B':'A';
- await q.locator('#study-settings').click();await q.locator('[data-settings-tab=bank]').click();await q.locator('#study-bank-import').click();await q.locator('#study-file').setInputFiles({name:'bank.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(pkg))});await q.locator('#study-apply').click();await q.waitForLoadState('load');await q.locator('#bank-enterprise').click();await q.locator('#enterprise-root details').evaluateAll(ds=>ds.forEach(d=>d.open=true));await q.locator('#e-search').fill('E001');assert.match(await q.locator('.enterprise-revision').innerText(),/已修订/);
+ await q.locator('#study-settings').click();await q.locator('[data-settings-tab=bank]').click();await q.locator('#study-bank-import').click();await q.locator('#study-file').setInputFiles({name:'bank.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(pkg))});await q.locator('#study-apply').click();await q.waitForLoadState('load');await q.locator('#bank-toggle').click();await q.locator('#bank-enterprise').click();await q.locator('#enterprise-root details').evaluateAll(ds=>ds.forEach(d=>d.open=true));await q.locator('#e-search').fill('E001');assert.match(await q.locator('.enterprise-revision').innerText(),/已修订/);
  assert.equal(await q.evaluate(()=>JSON.parse(localStorage.getItem('ai-enterprise-210-v1')).answers[1].correct),true);
  assert.deepEqual(errors,[]);await browser.close();console.log('PASS: enterprise 210 questions, old-progress isolation, grading, mobile, AI context, assessment, backup round-trip, legacy packages and revision retention.');
 })().catch(e=>{console.error(e);process.exit(1)});

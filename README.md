@@ -4,7 +4,7 @@
 
 - 在线刷题：<https://llh-astro.github.io/ai-study-room/>
 - APK 题库更新地址：<https://llh-astro.github.io/ai-study-room/bank.json>
-- Android 安装包：[v1.0.6](release/AI练习室-v1.0.6.apk)
+- Android 安装包：[v1.0.7](release/AI练习室-v1.0.7.apk)
 - [安装、备份与使用说明](release/安装与使用说明.md)
 - [短课学习方案（尚未实现；基础选择题已上线）](COURSE_PLAN.md)
 
@@ -89,3 +89,11 @@ python mobile/build_apk.py
 ## 企业智能决策题库（v1.0.6）
 
 新增独立 210 题：140 单选、70 多选，7 章各 30 题。包含概念、业务场景、指标计算与故障定位；支持错题、收藏、题内问 AI、完整备份与按章节学习评估。原 550 题源数据和存储标识不变。详见 [专项学习路线与资料](ENTERPRISE_STUDY.md)。
+
+## 侧边栏、公式与自建题库（v1.0.7）
+
+点击顶部“☰ 题库”展开侧边栏，选择后自动收起；支持收起按钮、遮罩、Esc 和 Android 返回。题干、解析、AI 回复及报告支持常见 LaTeX 公式，KaTeX 与字体内置，离线可用。代码和原始备份保留源文。
+
+[HTTPS 更新与自建格式指南](BANK_FORMAT.md) · [输入示例](custom-questions.example.json) · [合并与校验脚本](build_custom_bank.py)。模板需要通过脚本与当前 bank.json 合并，不能直接当完整更新包导入。
+
+测试中的自建题库生成需要 Python 3；可用 PYTHON_EXECUTABLE 指定解释器。KaTeX 0.16.22 来源与 MIT 许可证见 vendor/。

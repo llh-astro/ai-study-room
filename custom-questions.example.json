@@ -1,0 +1,17 @@
+{
+  "module": "我的检索练习",
+  "changelog": "新增一题 Recall 计算练习",
+  "questions": [
+    {
+      "type": "单选",
+      "difficulty": "基础",
+      "stem": "某查询共 8 篇相关文档，前 5 条结果中有 4 篇相关文档。\\(Recall@5\\) 是多少？",
+      "options": {"A": "0.8", "B": "0.5", "C": "1", "D": "0.4"},
+      "answer": "B",
+      "explanation": "召回率的分母是全部相关文档：\\[Recall@5=\\frac{4}{8}=0.5\\]",
+      "knowledge": "Recall 衡量相关文档的覆盖比例。",
+      "pitfall": "4/5 是该结果集的 Precision@5，不是 Recall@5。",
+      "refs": "https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html"
+    }
+  ]
+}

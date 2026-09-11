@@ -16,11 +16,12 @@ def build_view(template):
     js=js.replace('correct:v.choice===QS[Number(k)-1].answer',"correct:typeof v.correct==='boolean'?v.correct:v.choice===QS[Number(k)-1].answer")
     js=js.replace('[k,{choice:v.choice,correct:', '[k,{...(v.answerAtTime?{answerAtTime:v.answerAtTime}:{}),choice:v.choice,correct:')
     js=js.replace('{choice,correct:choice===q.answer}','{choice,correct:choice===q.answer,answerAtTime:q.answer}')
-    js=js.replace("document.addEventListener('keydown',e=>{if(","document.addEventListener('keydown',e=>{if(ROOT.hidden||document.getElementById('study-dialog').open)return;if(")
+    js=js.replace("document.addEventListener('keydown',e=>{if(","document.addEventListener('keydown',e=>{if(ROOT.hidden||document.querySelector('dialog[open]'))return;if(")
     js=js.replace('原题册第 ${q.page} 页 · 知识参考 ${esc(q.refs)}','原创基础练习 · 参考资料：<a href="${esc(q.refs)}" target="_blank" rel="noopener noreferrer">查看教材 / 官方文档</a>')
     for name in ['mode','module','choice','id']:
         panel=panel.replace('data-'+name,'data-b-'+name)
         js=js.replace('data-'+name,'data-b-'+name).replace('.dataset.'+name,'.dataset.b'+name.title())
+    js+="\n$('allCount').textContent=QS.length;$('doneStat').parentElement.querySelector('small').textContent='/ '+QS.length+' 题';ROOT.querySelector('aside .eyebrow').textContent='学习模块 / '+DATA.modules.length;\n"
     js+='\nwindow.Basics={current:()=>queue.length?QS[state.current-1]:null};\n'
     return panel,"window.initBasics=()=>{if(window.Basics)return;(()=>{'use strict';const ROOT=document.getElementById('basic-root');\n"+js+'\n})();};'
 
