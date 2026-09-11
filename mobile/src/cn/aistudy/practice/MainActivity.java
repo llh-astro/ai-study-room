@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
  private final Set<String> cancelled=ConcurrentHashMap.newKeySet();
  private String exportText;
  private static final String ORIGIN="https://study.local/", ALIAS="aistudy-deepseek-v1";
- private static final Set<String> KEYS=new HashSet<>(Arrays.asList("ai-basics-300-v1","ai-practice-150-v1","leetcode-hot100-python-v1","study-personal-v1","study-settings-v1","study-bank-v1"));
+ private static final Set<String> KEYS=new HashSet<>(Arrays.asList("ai-enterprise-210-v1","ai-basics-300-v1","ai-practice-150-v1","leetcode-hot100-python-v1","study-personal-v1","study-settings-v1","study-bank-v1"));
  @Override public void onCreate(Bundle state){
   super.onCreate(state);
   db=openOrCreateDatabase("study.db",MODE_PRIVATE,null);
@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
    }
    @Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest req){
     Uri u=req.getUrl();if(ORIGIN.equals(u.toString())||(ORIGIN+"index.html").equals(u.toString()))return false;
-    if(req.isForMainFrame()&&"https".equals(u.getScheme())&&java.util.Arrays.asList("leetcode.cn","www.deeplearningbook.org","scikit-learn.org","docs.pytorch.org","huggingface.co","docs.langchain.com").contains(u.getHost()))try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception ignored){}
+    if(req.isForMainFrame()&&"https".equals(u.getScheme())&&java.util.Arrays.asList("leetcode.cn","www.deeplearningbook.org","scikit-learn.org","docs.pytorch.org","huggingface.co","docs.langchain.com","www.elastic.co","nlp.stanford.edu","microsoft.github.io","www.postgresql.org","www.w3.org","arxiv.org","genai.owasp.org","packaging.python.org","docs.python.org","fastapi.tiangolo.com","json-schema.org","docs.pytest.org","docs.docker.com","git-scm.com","docs.scipy.org","www.itl.nist.gov","otexts.com","facebook.github.io","doi.org").contains(u.getHost()))try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception ignored){}
     return true;
    }
    @Override public void onReceivedSslError(WebView v,android.webkit.SslErrorHandler handler,android.net.http.SslError error){handler.cancel();}

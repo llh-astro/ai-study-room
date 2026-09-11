@@ -57,3 +57,6 @@ body:not([data-study-page="quiz"]):not([data-chat-sheet="true"])>.bank-switch,bo
  .study-dialog[open]{width:100%;max-width:100%;height:auto;max-height:none}.study-dialog #study-body{padding:12px 14px}.study-dialog-head{padding:10px 12px;gap:5px}.study-dialog .study-chat-compose .study-row{gap:6px}.study-dialog .study-chat-compose .study-row button{font-size:11px;padding:7px 9px}.study-check{line-height:1.5;margin:8px 0!important}
  .hot-editor{min-height:170px}.hot-editor-label{margin-top:15px}.hot-caption,.hot-state{font-size:10px}.hot-title{font-size:18px}.hot-details>summary{font-size:12px;padding:12px}
 }
+
+#enterprise-root .analysis p{white-space:pre-line}#enterprise-root .source a{overflow-wrap:anywhere;color:#6854dc}
+@media(max-width:760px){#e-moduleNav{display:none}.bank-switch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.bank-switch .bank-tab{font-size:10px;padding:8px 2px}.bank-note{display:none}}

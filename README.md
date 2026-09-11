@@ -1,16 +1,16 @@
 # AI 练习室
 
-离线刷题网站与 Android 应用：AI 岗位笔试 150 题 + LeetCode Hot100 100 题 + AI 基础认知 300 题，支持 DeepSeek 辅导、个人知识库与学习评估。
+离线刷题网站与 Android 应用：AI 岗位笔试 150 题 + LeetCode Hot100 100 题 + AI 基础认知 300 题 + 企业智能决策 210 题，支持 DeepSeek 辅导、个人知识库与学习评估。
 
 - 在线刷题：<https://llh-astro.github.io/ai-study-room/>
 - APK 题库更新地址：<https://llh-astro.github.io/ai-study-room/bank.json>
-- Android 安装包：[v1.0.5](release/AI练习室-v1.0.5.apk)
+- Android 安装包：[v1.0.6](release/AI练习室-v1.0.6.apk)
 - [安装、备份与使用说明](release/安装与使用说明.md)
 - [短课学习方案（尚未实现；基础选择题已上线）](COURSE_PLAN.md)
 
 ## 已实现
 
-- 三套题库，收藏、错题、算法草稿与掌握标记。
+- 四套题库，收藏、错题、算法草稿与掌握标记。
 - 底部四栏导航与左右滑动，手机端折叠筛选和题号导航。
 - 刷题页紧凑 AI 面板：输入框在顶部，题目和回复分别滚动；可拖动调节高度、下拉收起，保留每题聊天与本次未发送输入。
 - 用户自填 DeepSeek API Key，流式题目对话、停止生成、连接测试。
@@ -44,6 +44,7 @@
 
 ```sh
 python build_basics.py
+python build_enterprise.py
 python assemble.py
 python publish_bank.py
 python prepare_pages.py
@@ -84,3 +85,7 @@ python mobile/build_apk.py
 内容由 AI 辅助原创编写，参考 Deep Learning 教材以及 scikit-learn、PyTorch、Hugging Face 和 LangChain 官方资料，并非这些机构的原题或认证题。基础辨认练习不等于课程或编程能力验证。
 
 `basics-concepts.txt` 是概念内容源；`build_basics.py` 生成 `basics.json`。题号已发布后保持稳定，不能通过重排概念复用旧题号。基础进度使用独立键，备份和学习评估均包含它。旧题库包缺少 basics 时保留当前基础题库。旧 APK 需覆盖安装 v1.0.5 才有第三个入口，后续内容可通过 bank.json 更新。
+
+## 企业智能决策题库（v1.0.6）
+
+新增独立 210 题：140 单选、70 多选，7 章各 30 题。包含概念、业务场景、指标计算与故障定位；支持错题、收藏、题内问 AI、完整备份与按章节学习评估。原 550 题源数据和存储标识不变。详见 [专项学习路线与资料](ENTERPRISE_STUDY.md)。

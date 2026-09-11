@@ -23,3 +23,17 @@ def build_view(template):
         js=js.replace('data-'+name,'data-b-'+name).replace('.dataset.'+name,'.dataset.b'+name.title())
     js+='\nwindow.Basics={current:()=>queue.length?QS[state.current-1]:null};\n'
     return panel,"window.initBasics=()=>{if(window.Basics)return;(()=>{'use strict';const ROOT=document.getElementById('basic-root');\n"+js+'\n})();};'
+
+
+def build_enterprise_view(template):
+    """The same quiz behavior, with independent DOM, question IDs and storage."""
+    panel, js = build_view(template)
+    for old, new in [('ai-basics-300-v1', 'ai-enterprise-210-v1'),
+                     ('basics-data', 'enterprise-data'), ('basic-root', 'enterprise-root'),
+                     ('initBasics', 'initEnterprise'), ('window.Basics', 'window.Enterprise'),
+                     ('b-', 'e-'), ('.dataset.b', '.dataset.e')]:
+        panel, js = panel.replace(old, new), js.replace(old, new)
+    panel = panel.replace('300', '210').replace('基础认知', '企业智能决策').replace('学习模块 / 10', '学习模块 / 7')
+    panel = panel.replace('210 道精选训练题，从基础知识到 AI 场景判断。', '210 道专项题，练习检索、数据语义与可靠性评测。')
+    js = js.replace('`B${', '`E${').replace('>B${', '>E${').replace('原创基础练习', '原创企业决策练习')
+    return panel, js

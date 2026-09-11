@@ -1,19 +1,21 @@
 """Build the offline page while retaining the original quiz identifiers/storage."""
 from pathlib import Path
 import json
-from basics_view import build_view
+from basics_view import build_view, build_enterprise_view
 
 ROOT = Path(__file__).parent
 
 def assemble():
     page = (ROOT/'template.html').read_text(encoding='utf-8')
     basic_panel,basic_js=build_view(page)
+    enterprise_panel,enterprise_js=build_enterprise_view(page)
+    enterprise=json.loads((ROOT/'enterprise.json').read_text(encoding='utf-8'))
     basics=json.loads((ROOT/'basics.json').read_text(encoding='utf-8'))
     original = json.loads((ROOT/'questions.json').read_text(encoding='utf-8'))
     hot = json.loads((ROOT/'hot100.json').read_text(encoding='utf-8'))
     encode = lambda obj: json.dumps(obj,ensure_ascii=False).replace('</','<\\/')
     page = page.replace('__QUESTION_DATA__', encode(original))
-    page = page.replace('<title>AI 练习室 · 岗位笔试 150 题</title>', '<title>AI 练习室 · 笔试 150 题与 LeetCode Hot100</title>')
+    page = page.replace('<title>AI 练习室 · 岗位笔试 150 题</title>', '<title>AI 练习室 · 基础、算法与企业决策</title>')
     page = page.replace('</style>', (ROOT/'hot100.css').read_text(encoding='utf-8')+'\n</style>',1)
     page = page.replace('</style>', (ROOT/'study.css').read_text(encoding='utf-8')+'\n</style>',1)
     page = page.replace('</style>', (ROOT/'compact.css').read_text(encoding='utf-8')+'\n</style>',1)
@@ -32,14 +34,14 @@ def assemble():
     page = page.replace("{choice,correct:choice===q.answer}","{choice,correct:choice===q.answer,answerAtTime:q.answer}")
     page = page.replace("(a.length/150*100)","(a.length/QS.length*100)")
     page=page.replace('document.querySelectorAll', "document.getElementById('ai-bank-root').querySelectorAll")
-    page=page.replace('<script id="question-data"',basic_panel+'\n<script id="question-data"',1)
-    boot='\n<script type="application/json" id="basics-data">'+encode(basics)+'</script>\n<script type="application/json" id="hot100-data">'+encode(hot)+'</script>\n<script>\n'+(ROOT/'study-boot.js').read_text(encoding='utf-8')+'\n</script>\n'
+    page=page.replace('<script id="question-data"',basic_panel+enterprise_panel+'\n<script id="question-data"',1)
+    boot='\n<script type="application/json" id="enterprise-data">'+encode(enterprise)+'</script>\n<script type="application/json" id="basics-data">'+encode(basics)+'</script>\n<script type="application/json" id="hot100-data">'+encode(hot)+'</script>\n<script>\n'+(ROOT/'study-boot.js').read_text(encoding='utf-8')+'\n</script>\n'
     page=page.replace("<script>\n'use strict';",boot+"<script>\n'use strict';",1)
     hot_js=(ROOT/'hot100.js').read_text(encoding='utf-8')
     hot_js=hot_js.replace("if(!active||", "if(document.getElementById('study-dialog').open||!active||")
     hot_js=hot_js.replace("mastered+'%'", "(mastered/qs.length*100)+'%'")
     study_js=(ROOT/'study.js').read_text(encoding='utf-8').replace('// Testable pure contract;', (ROOT/'study-assessment.js').read_text(encoding='utf-8')+'\n'+(ROOT/'study-sheet.js').read_text(encoding='utf-8')+'\n// Testable pure contract;')
-    extra = '\n<script>\n'+hot_js+'\n</script>\n<script>\n'+basic_js+'\n</script>\n<script>\n'+(ROOT/'bank-tabs.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+study_js+'\n</script>\n'
+    extra = '\n<script>\n'+hot_js+'\n</script>\n<script>\n'+basic_js+'\n'+enterprise_js+'\n</script>\n<script>\n'+(ROOT/'bank-tabs.js').read_text(encoding='utf-8')+'\n</script>\n<script>\n'+study_js+'\n</script>\n'
     page = page.replace('</body>',extra+'</body>',1)
     assert "KEY='ai-practice-150-v1'" in page
     assert '__QUESTION_DATA__' not in page
