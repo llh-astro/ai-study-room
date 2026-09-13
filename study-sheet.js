@@ -41,7 +41,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetOpen){e.preven
 // Resize only from the handle/header; content areas keep their normal scrolling.
 let sheetDrag=null;
 const sheetHandle=$('study-sheet-handle');
-function sheetLimit(){return Math.max(160,window.innerHeight-parseFloat(getComputedStyle(document.body).getPropertyValue('--bottom-nav'))-110);}
+function sheetLimit(){return Math.max(160,(window.visualViewport?.height||window.innerHeight)-parseFloat(getComputedStyle(document.body).getPropertyValue('--bottom-nav'))-110);}
 function resizeSheet(height){const value=Math.round(Math.max(160,Math.min(sheetLimit(),height)));document.body.style.setProperty('--chat-panel-height',value+'px');sheetHandle.setAttribute('aria-valuenow',value);sheetHandle.setAttribute('aria-valuemax',Math.round(sheetLimit()));}
 for(const surface of [sheetHandle,document.querySelector('.study-dialog-head')]){
  surface.addEventListener('pointerdown',e=>{if(!sheetOpen||e.target.closest('button')||e.button!==0)return;sheetDrag={id:e.pointerId,y:e.clientY,height:$('study-dialog').getBoundingClientRect().height,surface};surface.setPointerCapture(e.pointerId);e.preventDefault();});
@@ -51,3 +51,7 @@ for(const surface of [sheetHandle,document.querySelector('.study-dialog-head')])
 }
 sheetHandle.addEventListener('keydown',e=>{const height=$('study-dialog').getBoundingClientRect().height;if(e.key==='ArrowUp'){e.preventDefault();resizeSheet(height+40);}else if(e.key==='ArrowDown'){e.preventDefault();if(height<=180){document.body.style.removeProperty('--chat-panel-height');navigate('quiz');}else resizeSheet(height-40);}else if(e.key==='Home'){e.preventDefault();navigate('quiz');}});
 window.addEventListener('resize',()=>{document.body.style.removeProperty('--chat-panel-height');});
+
+// Visual viewport handles browsers whose keyboard overlays the layout viewport.
+function syncChatViewport(){const v=window.visualViewport,offset=v?Math.max(0,window.innerHeight-v.height-v.offsetTop):0;document.body.style.setProperty('--keyboard-offset',offset+'px');document.body.style.setProperty('--visible-height',(v?.height||window.innerHeight)+'px');}
+window.visualViewport?.addEventListener('resize',syncChatViewport);window.visualViewport?.addEventListener('scroll',syncChatViewport);window.addEventListener('resize',syncChatViewport);document.addEventListener('focusin',syncChatViewport);syncChatViewport();

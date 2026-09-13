@@ -4,7 +4,7 @@
 
 - 在线刷题：<https://llh-astro.github.io/ai-study-room/>
 - APK 题库更新地址：<https://llh-astro.github.io/ai-study-room/bank.json>
-- Android 安装包：[v1.0.7](release/AI练习室-v1.0.7.apk)
+- Android 安装包：[v1.0.8](release/AI练习室-v1.0.8.apk)
 - [安装、备份与使用说明](release/安装与使用说明.md)
 - [短课学习方案（尚未实现；基础选择题已上线）](COURSE_PLAN.md)
 
@@ -97,3 +97,9 @@ python mobile/build_apk.py
 [HTTPS 更新与自建格式指南](BANK_FORMAT.md) · [输入示例](custom-questions.example.json) · [合并与校验脚本](build_custom_bank.py)。模板需要通过脚本与当前 bank.json 合并，不能直接当完整更新包导入。
 
 测试中的自建题库生成需要 Python 3；可用 PYTHON_EXECUTABLE 指定解释器。KaTeX 0.16.22 来源与 MIT 许可证见 vendor/。
+
+## 手机交互修复（v1.0.8）
+
+题库按钮移至左侧，安卓原生容器避开系统栏、刘海和键盘。全部练习、错题（算法待复习）、收藏在当前页面会话分别记住题目位置，切回全部恢复此前题目。问 AI 默认使用更低的紧凑面板，随可视区域与键盘变化自动上移，保留输入草稿及手动拖动收起。
+
+已测试浏览器模拟的键盘覆盖与窗口压缩；不同手机输入法仍需真机确认。

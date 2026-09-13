@@ -40,8 +40,14 @@ public class MainActivity extends Activity {
   super.onCreate(state);
   db=openOrCreateDatabase("study.db",MODE_PRIVATE,null);
   db.execSQL("CREATE TABLE IF NOT EXISTS records (k TEXT PRIMARY KEY, v TEXT NOT NULL)");
-  web=new WebView(this);web.setBackgroundColor(Color.WHITE);setContentView(web);
-  if(Build.VERSION.SDK_INT>=35)web.setOnApplyWindowInsetsListener((v,insets)->{android.graphics.Insets i=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.ime());v.setPadding(i.left,i.top,i.right,i.bottom);return insets;});
+  web=new WebView(this);web.setBackgroundColor(Color.WHITE);
+  android.widget.FrameLayout container=new android.widget.FrameLayout(this);
+  container.addView(web,new android.widget.FrameLayout.LayoutParams(-1,-1));setContentView(container);
+  if(Build.VERSION.SDK_INT>=30){
+   getWindow().setDecorFitsSystemWindows(false);
+   container.setOnApplyWindowInsetsListener((v,insets)->{android.graphics.Insets i=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.ime()|WindowInsets.Type.displayCutout());v.setPadding(i.left,i.top,i.right,i.bottom);return WindowInsets.CONSUMED;});
+   container.requestApplyInsets();
+  }
   WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setAllowFileAccess(false);s.setAllowContentAccess(false);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setJavaScriptCanOpenWindowsAutomatically(false);s.setSupportMultipleWindows(false);
   CookieManager.getInstance().setAcceptCookie(false);
   WebView.setWebContentsDebuggingEnabled(false);

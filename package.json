@@ -1,10 +1,10 @@
 {
   "name": "ai-study-room",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "description": "Offline quiz, DeepSeek tutoring and personal learning assessments",
   "scripts": {
-    "test": "node verify.cjs && node verify-hot100.cjs && node verify-study.cjs && node verify-navigation.cjs && node verify-assessment.cjs && node verify-native-contract.cjs && node verify-sheet.cjs && node verify-basics.cjs && node verify-enterprise.cjs && node verify-sidebar-math.cjs"
+    "test": "node verify.cjs && node verify-hot100.cjs && node verify-study.cjs && node verify-navigation.cjs && node verify-assessment.cjs && node verify-native-contract.cjs && node verify-sheet.cjs && node verify-basics.cjs && node verify-enterprise.cjs && node verify-sidebar-math.cjs && node verify-mobile-fixes.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

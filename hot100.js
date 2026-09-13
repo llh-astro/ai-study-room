@@ -78,8 +78,9 @@ function render(){
 }
 function statusButtons(){const status=store.status[store.current]||'';document.querySelectorAll('[data-h-mark]').forEach(b=>{b.classList.toggle('selected',b.dataset.hMark===status);b.setAttribute('aria-pressed',b.dataset.hMark===status)});$('h-current-status').textContent='自评状态：'+(status==='mastered'?'已掌握':status==='review'?'待复习':'未标记')+'。统计已更新，重新筛选时会更新当前题单。'}
 function move(delta){const next=queue[queue.indexOf(store.current)+delta];if(next){store.current=next;persist();render();$('h-question').scrollIntoView({behavior:'smooth',block:'start'})}}
-function clearFilters(){mode='all';for(const id of ['h-search','h-topic','h-difficulty','h-status'])$(id).value='';filter()}
-document.querySelectorAll('[data-h-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.hMode;for(const id of ['h-search','h-topic','h-difficulty','h-status'])$(id).value='';filter()});
+function clearFilters(){if(mode!=='all'){modePositions[mode]=store.current;store.current=modePositions.all??store.current;}mode='all';for(const id of ['h-search','h-topic','h-difficulty','h-status'])$(id).value='';filter()}
+const modePositions={};
+document.querySelectorAll('[data-h-mode]').forEach(b=>b.onclick=()=>{modePositions[mode]=store.current;mode=b.dataset.hMode;store.current=modePositions[mode]??store.current;for(const id of ['h-search','h-topic','h-difficulty','h-status'])$(id).value='';filter()});
 $('h-search').oninput=filter;for(const id of ['h-topic','h-difficulty','h-status'])$(id).onchange=filter;
 $('h-shuffle').onclick=()=>{for(let i=queue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[queue[i],queue[j]]=[queue[j],queue[i]]}if(queue.length){store.current=queue[0];persist();render()}};
 document.addEventListener('keydown',e=>{if(!active||['INPUT','TEXTAREA','SELECT','BUTTON','SUMMARY'].includes(e.target.tagName)||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-1)}if(e.key==='ArrowRight'){e.preventDefault();move(1)}});
