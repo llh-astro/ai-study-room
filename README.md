@@ -1,16 +1,20 @@
 # AI 练习室
 
-离线刷题网站与 Android 应用：AI 岗位笔试 150 题 + LeetCode Hot100 100 题 + AI 基础认知 300 题 + 企业智能决策 210 题，支持 DeepSeek 辅导、个人知识库与学习评估。
+离线刷题网站与 Android 应用：AI 岗位笔试 150 题 + LeetCode Hot100 100 题 + AI 基础认知 300 题 + 企业智能决策 210 题 + 模型训练实战入门 100 题，支持 DeepSeek 辅导、个人知识库与学习评估。
 
 - 在线刷题：<https://llh-astro.github.io/ai-study-room/>
 - APK 题库更新地址：<https://llh-astro.github.io/ai-study-room/bank.json>
-- Android 安装包：[v1.0.8](release/AI练习室-v1.0.8.apk)
+- Android 安装包：[v1.0.9](release/AI练习室-v1.0.9.apk)
 - [安装、备份与使用说明](release/安装与使用说明.md)
 - [短课学习方案（尚未实现；基础选择题已上线）](COURSE_PLAN.md)
 
+## 本次新增
+
+独立的[模型训练实战入门题库](training/README.md)：100 题、10 个阶段，配套 CPU MNIST 训练脚本。侧边栏选择“模型训练实战入门”即可顺序练习。旧 APK 请覆盖安装 v1.0.9（不要卸载）；以后题目内容可通过 HTTPS 或题库包更新。原四套题库与题号不变。
+
 ## 已实现
 
-- 四套题库，收藏、错题、算法草稿与掌握标记。
+- 五套题库，收藏、错题、算法草稿与掌握标记。
 - 底部四栏导航与左右滑动，手机端折叠筛选和题号导航。
 - 刷题页紧凑 AI 面板：输入框在顶部，题目和回复分别滚动；可拖动调节高度、下拉收起，保留每题聊天与本次未发送输入。
 - 用户自填 DeepSeek API Key，流式题目对话、停止生成、连接测试。
@@ -45,6 +49,7 @@
 ```sh
 python build_basics.py
 python build_enterprise.py
+python training/build_questions.py
 python assemble.py
 python publish_bank.py
 python prepare_pages.py
@@ -98,7 +103,7 @@ python mobile/build_apk.py
 
 测试中的自建题库生成需要 Python 3；可用 PYTHON_EXECUTABLE 指定解释器。KaTeX 0.16.22 来源与 MIT 许可证见 vendor/。
 
-## 手机交互修复（v1.0.8）
+## 手机交互修复（v1.0.9）
 
 题库按钮移至左侧，安卓原生容器避开系统栏、刘海和键盘。全部练习、错题（算法待复习）、收藏在当前页面会话分别记住题目位置，切回全部恢复此前题目。问 AI 默认使用更低的紧凑面板，随可视区域与键盘变化自动上移，保留输入草稿及手动拖动收起。
 

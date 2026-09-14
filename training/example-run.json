@@ -1,0 +1,76 @@
+{
+  "data": "MNIST, real data; CPU teaching subset",
+  "torch": "2.6.0+cpu",
+  "python": "3.12.14",
+  "config": {
+    "seed": 42,
+    "batch_size": 32,
+    "lr": 0.001,
+    "train_samples": 10000,
+    "val_samples": 2000
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "steps": 313,
+      "train_loss": 0.5965460052967072,
+      "train_accuracy": 0.8386,
+      "validation": {
+        "loss": 0.3313716471195221,
+        "accuracy": 0.8975,
+        "samples": 2000
+      }
+    },
+    {
+      "epoch": 2,
+      "steps": 313,
+      "train_loss": 0.2825739253520966,
+      "train_accuracy": 0.918,
+      "validation": {
+        "loss": 0.2530579665899277,
+        "accuracy": 0.919,
+        "samples": 2000
+      }
+    },
+    {
+      "epoch": 3,
+      "steps": 313,
+      "train_loss": 0.2142763757288456,
+      "train_accuracy": 0.9379,
+      "validation": {
+        "loss": 0.2178352998495102,
+        "accuracy": 0.931,
+        "samples": 2000
+      }
+    }
+  ],
+  "first_batch": {
+    "images_shape": [
+      32,
+      1,
+      28,
+      28
+    ],
+    "images_dtype": "torch.float32",
+    "labels_shape": [
+      32
+    ],
+    "labels_dtype": "torch.int64",
+    "logits_shape": [
+      32,
+      10
+    ],
+    "loss": 2.284041166305542,
+    "backward_changed_weights": false,
+    "grad_norm": 0.7179831266403198,
+    "step_weight_change_norm": 0.22727340459823608
+  },
+  "test": {
+    "loss": 0.2228233743727207,
+    "accuracy": 0.9362,
+    "samples": 10000
+  },
+  "reload_logits_match": true,
+  "sample_prediction": 7,
+  "parameter_count": 101770
+}

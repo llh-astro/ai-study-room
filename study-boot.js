@@ -1,6 +1,6 @@
 // Runs before either legacy quiz. Android persists these keys synchronously in SQLite.
 window.StudyStore=(()=>{
-  const names=['ai-enterprise-210-v1','ai-basics-300-v1','ai-practice-150-v1','leetcode-hot100-python-v1','study-personal-v1','study-settings-v1','study-bank-v1'];
+  const names=['ai-training-100-v1','ai-enterprise-210-v1','ai-basics-300-v1','ai-practice-150-v1','leetcode-hot100-python-v1','study-personal-v1','study-settings-v1','study-bank-v1'];
   const native=window.AndroidStudy;
   const get=Storage.prototype.getItem,set=Storage.prototype.setItem,remove=Storage.prototype.removeItem;
   if(native){
@@ -21,6 +21,7 @@ try{
   document.getElementById('question-data').textContent=JSON.stringify(bank.ai);
   // The Hot100 data element is placed ahead of this bootstrap by the builder.
   document.getElementById('hot100-data').textContent=JSON.stringify(bank.hot);
+  if(bank.training)document.getElementById('training-data').textContent=JSON.stringify(bank.training);
   if(bank.enterprise)document.getElementById('enterprise-data').textContent=JSON.stringify(bank.enterprise);
   if(bank.basics)document.getElementById('basics-data').textContent=JSON.stringify(bank.basics);
  }

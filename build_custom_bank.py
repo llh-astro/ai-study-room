@@ -41,7 +41,7 @@ def build(base, source, target, version):
             if not isinstance(q.get(key), str) or len(q[key]) > 200000:
                 raise ValueError(f'题 {qid}：缺少字符串字段 {key} 或字段过长')
         u = urlparse(q['refs'])
-        if target in ['basics', 'enterprise'] and (u.scheme != 'https' or not u.netloc or u.username or u.password):
+        if target in ['basics', 'enterprise', 'training'] and (u.scheme != 'https' or not u.netloc or u.username or u.password):
             raise ValueError(f'题 {qid}：refs 必须是无凭据的 HTTPS 参考链接')
         if qid <= len(data['questions']):
             data['questions'][qid-1] = q
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base', required=True, type=Path)
     parser.add_argument('--input', required=True, type=Path)
-    parser.add_argument('--target', choices=['ai', 'basics', 'enterprise'], default='enterprise')
+    parser.add_argument('--target', choices=['ai', 'basics', 'enterprise', 'training'], default='enterprise')
     parser.add_argument('--version', required=True)
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()

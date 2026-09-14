@@ -38,3 +38,12 @@ def build_enterprise_view(template):
     panel = panel.replace('210 道精选训练题，从基础知识到 AI 场景判断。', '210 道专项题，练习检索、数据语义与可靠性评测。')
     js = js.replace('`B${', '`E${').replace('>B${', '>E${').replace('原创基础练习', '原创企业决策练习')
     return panel, js
+
+
+def build_training_view(template):
+    panel, js = build_enterprise_view(template)
+    for old, new in [('ai-enterprise-210-v1','ai-training-100-v1'),('enterprise','training'),('Enterprise','Training'),('e-','t-'),('.dataset.e','.dataset.t')]:
+        panel, js = panel.replace(old,new), js.replace(old,new)
+    panel = panel.replace('210','100').replace('企业智能决策','模型训练实战入门').replace('学习模块 / 7','学习模块 / 10').replace('练习检索、数据语义与可靠性评测。','跟随 MNIST 实验走完训练全过程。')
+    js = js.replace('`E${','`T${').replace('>E${','>T${').replace('原创企业决策练习','原创训练流程练习')
+    return panel, js

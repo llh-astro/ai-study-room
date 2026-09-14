@@ -17,3 +17,7 @@ preview-*.png
 test-results/
 playwright-report/
 publish-prep.py
+
+training/data/
+training/runs/
+training/.venv/

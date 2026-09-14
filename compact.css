@@ -64,3 +64,6 @@ body:not([data-study-page="quiz"]):not([data-chat-sheet="true"])>.bank-switch,bo
 body[data-chat-sheet="true"] .study-dialog[open]{bottom:calc(var(--bottom-nav) + env(safe-area-inset-bottom) + var(--keyboard-offset,0px));max-height:calc(var(--visible-height,100dvh) - var(--bottom-nav) - 70px)}
 body[data-chat-sheet="true"]>.layout:not([hidden]){bottom:calc(min(var(--chat-panel-height),var(--visible-height,100dvh) - var(--bottom-nav) - 70px) + var(--bottom-nav) + env(safe-area-inset-bottom) + var(--keyboard-offset,0px))}
 body[data-chat-sheet="true"] .study-tools{bottom:var(--keyboard-offset,0px)}
+
+#training-root .analysis p{white-space:pre-line}#training-root .source a{overflow-wrap:anywhere;color:#6854dc}
+@media(max-width:760px){#t-moduleNav{display:none}}
